@@ -1,0 +1,95 @@
+package backend.service;
+
+import backend.model.Dato;
+import backend.repository.DatoRepository;
+import java.util.List;
+import org.springframework.stereotype.Service;
+
+@Service
+public class DatoService {
+
+    private final DatoRepository repository;
+
+    public DatoService(DatoRepository repository) {
+        this.repository = repository;
+    }
+
+    public void guardar(Dato d) {
+        repository.save(d);
+    }
+
+    public List<Dato> obtener() {
+        return repository.findAll();
+    }
+
+    public int total() {
+        return repository.findAll().size();
+    }
+
+    public long contarColor(String color) {
+        return repository.findAll().stream()
+                .filter(d -> d.getColor() != null && d.getColor().equalsIgnoreCase(color))
+                .count();
+    }
+
+    public long contarObjeto(String objeto) {
+        return repository.findAll().stream()
+                .filter(d -> d.getObjeto() != null && d.getObjeto().equalsIgnoreCase(objeto))
+                .count();
+    }
+
+    public Dato ultimoDato() {
+        List<Dato> datos = repository.findAll();
+        if (datos.isEmpty()) {
+            return null;
+        }
+        return datos.get(datos.size() - 1);
+    }
+
+    public String construirContextoProyecto() {
+        int total = total();
+        long rojos = contarColor("ROJO");
+        long verdes = contarColor("VERDE");
+        long azules = contarColor("AZUL");
+
+        long tuercas = contarObjeto("tuerca");
+        long tornillos = contarObjeto("tornillo");
+        long arandelas = contarObjeto("arandela");
+
+        Dato ultimo = ultimoDato();
+
+        String ultimoTexto = (ultimo == null)
+                ? "No hay datos todavía."
+                : "Último dato: color " + ultimo.getColor() + ", objeto " + ultimo.getObjeto() + ", hora "
+                        + ultimo.getTimestamp() + ".";
+
+        return """
+                Eres un asistente de un proyecto de robótica y mecatrónica.
+
+                Proyecto:
+                - Banda transportadora
+                - Cámara con OpenCV
+                - Clasificación por color
+                - ROJO = tuerca
+                - VERDE = tornillo
+                - AZUL = arandela
+                - Brazo robótico con Arduino Mega y PCA9685
+                - Dashboard web con monitoreo en tiempo real
+
+                Datos actuales:
+                - Total de objetos: %d
+                - Rojos: %d
+                - Verdes: %d
+                - Azules: %d
+                - Tuercas: %d
+                - Tornillos: %d
+                - Arandelas: %d
+                - %s
+
+                Reglas:
+                - Responde siempre en español.
+                - Responde breve y claro.
+                - Usa los datos reales.
+                """.formatted(total, rojos, verdes, azules, tuercas, tornillos, arandelas, ultimoTexto);
+    }
+}
