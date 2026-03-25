@@ -1,0 +1,7 @@
+Se diseñó y desarrolló el brazo robótico como parte fundamental del sistema automatizado, encargado de la manipulación de objetos dentro del proceso de la banda transportadora.
+
+El desarrollo incluyó la construcción de la estructura mecánica, la implementación de los actuadores necesarios para el movimiento y la configuración del control para permitir su operación dentro del sistema. Adicionalmente, se utilizaron técnicas de impresión 3D para la fabricación de algunas piezas del brazo, permitiendo obtener componentes personalizados, ligeros y adaptados a las necesidades del proyecto.
+
+Se logró que el brazo ejecutara movimientos básicos de posicionamiento y manipulación de objetos de forma controlada, integrándose correctamente con el resto del sistema.
+
+Este componente permite interactuar directamente con los elementos transportados, siendo clave para la automatización del proceso y la integración del sistema físico con la lógica de control.
