@@ -1,0 +1,70 @@
+package backend.service;
+
+import backend.model.OllamaChatRequest;
+import backend.model.OllamaChatRequest.Message;
+import java.util.List;
+import java.util.Map;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+@Service
+public class OllamaService {
+
+    private static final String URL = "http://localhost:11434/api/chat";
+    private static final String MODEL = "gemma:2b";
+
+    private final RestTemplate restTemplate = new RestTemplate();
+
+    public String preguntar(String contexto, String pregunta) {
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            String preguntaFinal = """
+                    Responde la siguiente pregunta del usuario de forma natural y sin repetir instrucciones.
+
+                    Pregunta:
+                    %s
+                    """.formatted(pregunta);
+
+            OllamaChatRequest req = new OllamaChatRequest();
+            req.model = MODEL;
+            req.stream = false;
+            req.messages = List.of(
+                    new Message("system", contexto),
+                    new Message("user", preguntaFinal));
+
+            HttpEntity<OllamaChatRequest> entity = new HttpEntity<>(req, headers);
+            ResponseEntity<Map> response = restTemplate.postForEntity(URL, entity, Map.class);
+
+            Map<?, ?> body = response.getBody();
+
+            if (body != null && body.get("message") != null) {
+                Object messageObj = body.get("message");
+
+                if (messageObj instanceof Map<?, ?> msg) {
+                    Object content = msg.get("content");
+
+                    if (content != null) {
+                        return limpiarRespuesta(content.toString().trim());
+                    }
+                }
+            }
+
+            return "No hubo respuesta de la IA.";
+        } catch (Exception e) {
+            return "Error IA: " + e.getMessage();
+        }
+    }
+
+    private String limpiarRespuesta(String texto) {
+        if (texto.startsWith("Sistema:") || texto.startsWith("Proyecto:") || texto.contains("REGLAS IMPORTANTES")) {
+            return "Hola. Soy el asistente del proyecto. Pregúntame por producción, objetos detectados, colores, alertas o funcionamiento del sistema.";
+        }
+        return texto;
+    }
+}
