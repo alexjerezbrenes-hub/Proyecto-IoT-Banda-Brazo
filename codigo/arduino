@@ -1,1 +1,32 @@
-arduino
+#include <Wire.h>
+#include <Adafruit_PWMServoDriver.h>
+
+Adafruit_PWMServoDriver pca = Adafruit_PWMServoDriver();
+
+#define SERVOMIN 150
+#define SERVOMAX 600
+
+void mover(int servo, int angulo){
+  int pulso = map(angulo,0,180,SERVOMIN,SERVOMAX);
+  pca.setPWM(servo,0,pulso);
+}
+
+void rojo(){ mover(0,30); }
+void verde(){ mover(0,90); }
+void azul(){ mover(0,150); }
+
+void setup(){
+  Serial.begin(115200);
+  pca.begin();
+  pca.setPWMFreq(50);
+}
+
+void loop(){
+  if(Serial.available()){
+    char c = Serial.read();
+
+    if(c=='R') rojo();
+    if(c=='V') verde();
+    if(c=='A') azul();
+  }
+}
