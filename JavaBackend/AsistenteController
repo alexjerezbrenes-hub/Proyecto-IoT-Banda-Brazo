@@ -1,0 +1,38 @@
+package backend.controller;
+
+import backend.model.PreguntaRequest;
+import backend.model.RespuestaAsistente;
+import backend.service.DatoService;
+import backend.service.OllamaService;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@CrossOrigin
+public class AsistenteController {
+
+    private final DatoService datoService;
+    private final OllamaService ollamaService;
+
+    public AsistenteController(DatoService d, OllamaService o) {
+        this.datoService = d;
+        this.ollamaService = o;
+    }
+
+    @PostMapping("/asistente")
+    public RespuestaAsistente preguntar(@RequestBody PreguntaRequest req) {
+        String pregunta = req.pregunta == null ? "" : req.pregunta.trim().toLowerCase();
+
+        if (pregunta.equals("hola") || pregunta.equals("buenas") || pregunta.equals("hello")) {
+            return new RespuestaAsistente(
+                    "Hola, soy el asistente del proyecto. Puedo ayudarte con objetos detectados, producción, colores, alertas y recomendaciones.");
+        }
+
+        if (pregunta.equals("gracias")) {
+            return new RespuestaAsistente("Con gusto. Estoy aquí para ayudarte con el proyecto.");
+        }
+
+        String contexto = datoService.construirContextoProyecto();
+        String respuesta = ollamaService.preguntar(contexto, req.pregunta);
+        return new RespuestaAsistente(respuesta);
+    }
+}
