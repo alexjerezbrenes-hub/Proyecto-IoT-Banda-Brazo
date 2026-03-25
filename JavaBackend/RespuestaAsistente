@@ -1,0 +1,12 @@
+package backend.model;
+
+public class RespuestaAsistente {
+    public String respuesta;
+
+    public RespuestaAsistente() {
+    }
+
+    public RespuestaAsistente(String respuesta) {
+        this.respuesta = respuesta;
+    }
+}
