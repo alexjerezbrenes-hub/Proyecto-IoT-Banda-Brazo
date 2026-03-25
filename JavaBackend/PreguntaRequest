@@ -1,0 +1,5 @@
+package backend.model;
+
+public class PreguntaRequest {
+    public String pregunta;
+}
