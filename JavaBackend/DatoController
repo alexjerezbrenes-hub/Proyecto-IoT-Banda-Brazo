@@ -1,0 +1,27 @@
+package backend.controller;
+
+import backend.model.Dato;
+import backend.service.DatoService;
+import java.util.List;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@CrossOrigin
+public class DatoController {
+
+    private final DatoService service;
+
+    public DatoController(DatoService service) {
+        this.service = service;
+    }
+
+    @PostMapping("/datos")
+    public void recibir(@RequestBody Dato d) {
+        service.guardar(d);
+    }
+
+    @GetMapping("/datos")
+    public List<Dato> consultar() {
+        return service.obtener();
+    }
+}
